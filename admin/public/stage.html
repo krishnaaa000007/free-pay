@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Free Pay — Demo Stage</title>
+    <style>
+      :root {
+        --parchment: #f7efe3;
+        --parchment-deep: #eee2ce;
+        --surface: #fffbf4;
+        --ink: #2b1d14;
+        --ink-soft: #5a4634;
+        --muted: #8b7461;
+        --hairline: rgba(43, 29, 20, 0.08);
+        --saffron: #e8891d;
+        --saffron-deep: #c96f0f;
+        --saffron-soft: #fbe3c6;
+        --success: #3e7c4a;
+        --success-soft: #dcebd9;
+        --danger: #b5371f;
+        --danger-soft: #f6d5cd;
+        --info: #2f6b8a;
+        --info-soft: #d6e6ee;
+        --font-display: Georgia, 'Times New Roman', serif;
+        --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(circle at 20% 0%, #fdf6ea 0%, var(--parchment) 45%, #efe2cf 100%);
+        color: var(--ink);
+        font-family: var(--font-body);
+      }
+      body { display: flex; flex-direction: column; overflow: hidden; }
+
+      /* ---------- top bar ---------- */
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 20px;
+        background: rgba(255, 251, 244, 0.9);
+        border-bottom: 1px solid var(--hairline);
+        backdrop-filter: blur(8px);
+        flex: none;
+      }
+      .brand { display: flex; align-items: center; gap: 10px; margin-right: 6px; }
+      .brand-mark {
+        width: 32px; height: 32px; border-radius: 9px;
+        background: linear-gradient(135deg, #f2a044, #c96f0f);
+        display: grid; place-items: center; color: #fff8ec; font-weight: 700;
+      }
+      .brand-name { font-family: var(--font-display); font-size: 19px; line-height: 1; }
+      .brand-sub { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+      .spacer { flex: 1; }
+
+      button {
+        font: inherit; cursor: pointer;
+        border-radius: 10px; border: 1px solid #d3bfa3;
+        background: var(--surface); color: var(--ink);
+        padding: 8px 13px; font-size: 13px; font-weight: 600;
+        transition: transform .08s ease, background .15s ease, border-color .15s ease;
+      }
+      button:hover { background: var(--parchment-deep); }
+      button:active { transform: scale(0.97); }
+      button.primary { background: linear-gradient(135deg, #f2a044, #c96f0f); border-color: transparent; color: #fff8ec; }
+      button.danger { background: var(--danger); border-color: transparent; color: #fff; }
+      button.ghost { border-color: transparent; background: transparent; color: var(--saffron-deep); }
+      .group { display: flex; gap: 6px; align-items: center; }
+      .divider { width: 1px; height: 26px; background: var(--hairline); margin: 0 4px; }
+
+      .netpill {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+        background: var(--success-soft); color: var(--success);
+      }
+      .netpill.offline { background: var(--danger-soft); color: var(--danger); }
+      .netpill i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+      .netpill.offline i { animation: blink 1.1s infinite; }
+      @keyframes blink { 50% { opacity: 0.25; } }
+
+      /* ---------- stage ---------- */
+      main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+        padding: 18px 24px 22px;
+        min-height: 0;
+        justify-items: center;
+      }
+      .lane { display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; width: 100%; }
+      .lane-head { display: flex; align-items: center; gap: 10px; }
+      .role {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      }
+      .role.pilgrim { background: var(--info-soft); color: var(--info); }
+      .role.vendor { background: var(--saffron-soft); color: var(--saffron-deep); }
+      .who { font-size: 13px; color: var(--muted); }
+
+      .phone {
+        position: relative;
+        border-radius: 42px;
+        padding: 12px;
+        background: linear-gradient(160deg, #3a2a1e, #1d130c);
+        box-shadow: 0 22px 50px rgba(58, 36, 16, 0.32), inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+        flex: none;
+      }
+      .phone::after {
+        content: '';
+        position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+        width: 104px; height: 22px; border-radius: 14px; background: #17100a; z-index: 3;
+      }
+      .screen {
+        width: 375px; height: 760px;
+        border-radius: 32px; overflow: hidden; background: var(--parchment);
+        position: relative;
+      }
+      .screen iframe { width: 375px; height: 760px; border: 0; display: block; }
+      .lane-foot { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+      .lane-foot button { padding: 5px 10px; font-size: 12px; }
+      .origin { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted); }
+
+      /* relay flash between the phones */
+      .relay {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: var(--ink); color: var(--parchment);
+        padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+        opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+        z-index: 50; display: flex; align-items: center; gap: 10px;
+      }
+      .relay.show { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+      .relay b { color: #f6c98a; }
+
+      /* script strip */
+      .script {
+        flex: none;
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 20px 13px;
+        font-size: 12.5px; color: var(--ink-soft);
+        background: rgba(255, 251, 244, 0.75);
+        border-top: 1px solid var(--hairline);
+        overflow-x: auto;
+      }
+      .step {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 5px 12px; border-radius: 999px; background: var(--surface);
+        border: 1px solid var(--hairline); white-space: nowrap;
+      }
+      .step b {
+        width: 18px; height: 18px; border-radius: 50%; background: var(--parchment-deep);
+        display: grid; place-items: center; font-size: 11px; color: var(--ink-soft);
+      }
+      .step.on { border-color: var(--saffron); background: var(--saffron-soft); }
+      .step.on b { background: var(--saffron); color: #fff8ec; }
+      .arrow { color: var(--muted); }
+
+      @media (max-width: 1180px) {
+        .screen, .screen iframe { width: 340px; height: 680px; }
+      }
+      @media (max-width: 1040px) {
+        main { grid-template-columns: 1fr; overflow: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="brand-mark">F</div>
+        <div>
+          <div class="brand-name">Free Pay</div>
+          <div class="brand-sub">Demo stage</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group">
+        <button id="net" class="danger">Cut the network</button>
+        <span id="netstate" class="netpill"><i></i> Both phones online</span>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="group">
+        <button data-goto-left="/(pilgrim)/home">Pilgrim home</button>
+        <button data-goto-right="/(vendor)/accept">Vendor accept</button>
+        <button data-goto-right="/(vendor)/sync">Vendor sync</button>
+      </div>
+      <div class="divider"></div>
+      <div class="group">
+        <button id="reload" class="ghost">Reload both</button>
+        <button id="dashboard" class="primary">Ops dashboard ↗</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="lane">
+        <div class="lane-head">
+          <span class="role pilgrim">Pilgrim</span>
+          <span class="who">Arjun Sharma · 9000000001</span>
+        </div>
+        <div class="phone"><div class="screen"><iframe id="left" src="http://localhost:8081" allow="camera; clipboard-read; clipboard-write; geolocation"></iframe></div></div>
+        <div class="lane-foot">
+          <span class="origin">localhost:8081</span>
+        </div>
+      </section>
+
+      <section class="lane">
+        <div class="lane-head">
+          <span class="role vendor">Vendor</span>
+          <span class="who">Shankar Chai &amp; Snacks · 9000000002</span>
+        </div>
+        <div class="phone"><div class="screen"><iframe id="right" src="http://127.0.0.1:8081" allow="camera; clipboard-read; clipboard-write; geolocation"></iframe></div></div>
+        <div class="lane-foot">
+          <span class="origin">127.0.0.1:8081 — separate session</span>
+        </div>
+      </section>
+    </main>
+
+    <div id="relay" class="relay"></div>
+
+    <div class="script">
+      <span class="step" data-step="1"><b>1</b> Sign in: Pilgrim demo (left) · Vendor demo (right)</span>
+      <span class="arrow">→</span>
+      <span class="step" data-step="2"><b>2</b> Cut the network</span>
+      <span class="arrow">→</span>
+      <span class="step" data-step="3"><b>3</b> Pilgrim: tap a stall → amount → Show offline code</span>
+      <span class="arrow">→</span>
+      <span class="step" data-step="4"><b>4</b> Vendor verifies offline → Accept</span>
+      <span class="arrow">→</span>
+      <span class="step" data-step="5"><b>5</b> Restore network → Vendor sync → ops dashboard</span>
+    </div>
+
+    <script>
+      // The two phones are separate browser origins (localhost vs 127.0.0.1), so they have
+      // independent sessions, device keys and local ledgers — exactly like two handsets.
+      const left = document.getElementById('left');
+      const right = document.getElementById('right');
+      const frames = () => [left.contentWindow, right.contentWindow];
+      const relay = document.getElementById('relay');
+      let relayTimer = null;
+
+      function flash(html) {
+        relay.innerHTML = html;
+        relay.classList.add('show');
+        clearTimeout(relayTimer);
+        relayTimer = setTimeout(() => relay.classList.remove('show'), 1800);
+      }
+
+      function post(win, message) {
+        try { win && win.postMessage(message, '*'); } catch (_) {}
+      }
+
+      /**
+       * QR relay: on a desktop there is no camera to hold up to the other phone, so the
+       * stage forwards the exact QR string between them. Every signature and fraud check
+       * in the apps runs unchanged.
+       */
+      // A code generated while the vendor is on another screen is held here and handed
+      // over the moment the vendor opens Accept — the phone is "shown" when they look.
+      let pendingQr = null;
+
+      window.addEventListener('message', (event) => {
+        const m = event.data;
+        if (!m || m.source !== 'freepay') return;
+        const fromLeft = event.source === left.contentWindow;
+        const other = fromLeft ? right.contentWindow : left.contentWindow;
+        if (m.kind === 'QR') {
+          pendingQr = m;
+          post(other, m);
+          flash('<span>📷</span> Payment code relayed <b>pilgrim → vendor</b>');
+          markStep(4);
+        } else if (m.kind === 'RECEIPT') {
+          pendingQr = null;
+          post(other, m);
+          flash('<span>🧾</span> Signed receipt relayed <b>vendor → pilgrim</b>');
+          markStep(5);
+        } else if (m.kind === 'HELLO' && m.role === 'vendor' && pendingQr) {
+          post(event.source, pendingQr);
+          flash('<span>📷</span> Waiting code handed to the <b>vendor</b>');
+        }
+      });
+
+      // ---- network kill switch (drives both phones at once) ----
+      let offline = false;
+      const netBtn = document.getElementById('net');
+      const netState = document.getElementById('netstate');
+      function setNetwork(next) {
+        offline = next;
+        frames().forEach((w) => post(w, { source: 'freepay', kind: 'NETWORK', offline }));
+        netBtn.textContent = offline ? 'Restore network' : 'Cut the network';
+        netBtn.className = offline ? 'primary' : 'danger';
+        netState.className = 'netpill' + (offline ? ' offline' : '');
+        netState.innerHTML = '<i></i> ' + (offline ? 'Both phones offline' : 'Both phones online');
+        flash(offline ? '<span>📵</span> Network cut — <b>payments still work</b>' : '<span>📶</span> Network restored — <b>auto-sync running</b>');
+        markStep(offline ? 3 : 5);
+      }
+      netBtn.addEventListener('click', () => setNetwork(!offline));
+
+      // ---- navigation helpers ----
+      document.querySelectorAll('[data-goto-left]').forEach((b) =>
+        b.addEventListener('click', () => { left.src = 'http://localhost:8081' + b.dataset.gotoLeft; }),
+      );
+      document.querySelectorAll('[data-goto-right]').forEach((b) =>
+        b.addEventListener('click', () => { right.src = 'http://127.0.0.1:8081' + b.dataset.gotoRight; }),
+      );
+      document.getElementById('reload').addEventListener('click', () => {
+        left.src = 'http://localhost:8081';
+        right.src = 'http://127.0.0.1:8081';
+        markStep(1);
+      });
+      document.getElementById('dashboard').addEventListener('click', () => window.open('/', '_blank'));
+
+      // ---- script strip highlighting ----
+      function markStep(n) {
+        document.querySelectorAll('.step').forEach((s) => s.classList.toggle('on', Number(s.dataset.step) === n));
+      }
+      markStep(1);
+
+      // Re-assert the network state to a phone that just reloaded.
+      [left, right].forEach((f) =>
+        f.addEventListener('load', () => {
+          setTimeout(() => post(f.contentWindow, { source: 'freepay', kind: 'NETWORK', offline }), 1200);
+        }),
+      );
+    </script>
+  </body>
+</html>

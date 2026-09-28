@@ -1,0 +1,5 @@
+{
+  "_comment": "Origins the two demo phones load the app from. They MUST differ: browser storage is per-origin, which is what keeps the two handsets' sessions, device keys and offline ledgers separate. After deploying, set these to the two app deployments. A ?app= query parameter overrides whichever phone you open.",
+  "pilgrim": "http://localhost:8081",
+  "vendor": "http://127.0.0.1:8081"
+}

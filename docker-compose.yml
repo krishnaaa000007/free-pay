@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: freepay-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: freepay
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - freepay_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d freepay"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  freepay_pgdata:
