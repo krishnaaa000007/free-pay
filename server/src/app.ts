@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import helmet from 'helmet';
+import * as helmetNs from 'helmet';
 import { config } from './config.js';
 import { checkDb } from './db.js';
 import { requestLogger } from './logger.js';
@@ -22,6 +22,13 @@ import { getPlatformKeys } from './services/platformKeys.js';
  * Builds the Express application without binding a port, so tests can mount it with
  * supertest and index.ts can own the process lifecycle.
  */
+/**
+ * helmet ships dual CJS/ESM types. Under this package's `esModuleInterop` the default
+ * import is callable, but Vercel's function compiler resolves it to a namespace whose
+ * callable sits on `.default`. Normalising here keeps one import working in both.
+ */
+const helmet = ((helmetNs as unknown as { default?: unknown }).default ?? helmetNs) as () => express.RequestHandler;
+
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');

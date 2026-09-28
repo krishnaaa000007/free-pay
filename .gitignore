@@ -21,3 +21,9 @@ coverage/
 
 # Env blocks to paste into the Vercel dashboard - contain live secrets
 .vercel-env/
+
+# Vercel CLI project linkage
+.vercel
+
+.vercel
+.env*

@@ -1,0 +1,16 @@
+# Never ship local env files to the builder: they are not needed (Vercel supplies the
+# environment) and they silently override intent - an uploaded .env is what turned
+# EXPO_PUBLIC_DEMO_RELAY back on during the first deploy.
+.env
+.env.*
+.vercel-env/
+
+# Not part of the mobile web build; they are their own Vercel projects.
+server/
+admin/
+__tests__/
+
+node_modules
+.expo/
+dist/
+coverage/

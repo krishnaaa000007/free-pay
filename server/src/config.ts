@@ -153,7 +153,14 @@ export const config = {
   },
   openai: { apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL },
   /** Enables /api/demo (single-device pitch walkthrough). Never on in production. */
-  demoMode: env.NODE_ENV !== 'production' && (env.DEMO_MODE ?? 'true').toLowerCase() !== 'false',
+  // /api/demo provisions throw-away device keys and relays QR payloads: useful for a
+  // pitch, and something that must never appear in a real deployment by accident. Outside
+  // production it is on unless switched off; in production it stays off unless DEMO_MODE
+  // is explicitly "true", which is a deliberate act for a demo deployment.
+  demoMode:
+    env.NODE_ENV !== 'production'
+      ? (env.DEMO_MODE ?? 'true').toLowerCase() !== 'false'
+      : (env.DEMO_MODE ?? '').toLowerCase() === 'true',
 };
 
 export type AppConfig = typeof config;
